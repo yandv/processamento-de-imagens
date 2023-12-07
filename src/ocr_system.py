@@ -13,7 +13,7 @@ def pre_processamento(imagem) -> cv2.typing.MatLike:
 
     # Aplica um threshold para binarizar a imagem
     #preProcessedImage = cv2.threshold(preProcessedImage, 0, 255, cv2.THRESH_BINARY)[1]
-    preProcessedImage = cv2.adaptiveThreshold(preProcessedImage, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 41, 10)
+    preProcessedImage = cv2.adaptiveThreshold(preProcessedImage, 255, cv2.ADAPTIVE_THRESH_MEAN_C + cv2.THRESH_OTSU, cv2.THRESH_BINARY_INV, 41, 10)
 
     # Aumenta o contraste da imagem para melhorar a segmentação dos caracteres da imagem binarizada (opcional)
     preProcessedImage = cv2.addWeighted(preProcessedImage, 1.5, preProcessedImage, -0.5, 0)
@@ -27,6 +27,8 @@ def pre_processamento(imagem) -> cv2.typing.MatLike:
     return preProcessedImage
 
 def localizar_texto(preProcessedImage):
+    preProcessedImage = cv2.Canny(preProcessedImage,100,200)
+
     # Aplica a função findContours para encontrar os contornos da imagem
     contornos, _ = cv2.findContours(preProcessedImage, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
@@ -74,7 +76,7 @@ def pos_processamento(textos):
 
     # splitar palavras
 
-    textos = [re.sub(r"([A-Z])", r" \1", text).split() for text in textos]
+    textos = [re.sub(r"([A-Z])", r" \1", text) for text in textos]
 
     return textos
 
